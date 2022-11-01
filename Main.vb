@@ -20,7 +20,11 @@ Module Main
     End Sub
 
     Sub GetNodeInfo(walletAddress)
-
+        Dim WebClient As New WebClient
+        Dim result = WebClient.DownloadString("https://api.runonflux.io/daemon/listzelnodes?filter=" + walletAddress)
+        Dim resultObject = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(result)
+        Console.WriteLine(result)
+        Console.ReadLine()
     End Sub
 
 End Module
