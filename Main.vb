@@ -15,16 +15,43 @@ Module Main
         Dim resultObject = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(result)
 
         If resultObject.Item("data").Item("isvalid") Then
-            GetNodeInfo(walletAddress)
+            Dim ipList = GetNodeInfo(walletAddress)
+
+            If ipList.Count > 0 Then
+                For Each ip In ipList
+                    GetNodeBenchMarks(ip)
+                Next
+            End If
         End If
+
     End Sub
 
-    Sub GetNodeInfo(walletAddress)
+    Function GetNodeInfo(walletAddress)
         Dim WebClient As New WebClient
         Dim result = WebClient.DownloadString("https://api.runonflux.io/daemon/listzelnodes?filter=" + walletAddress)
         Dim resultObject = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(result)
+        Dim ipList = New ArrayList
+
+        If resultObject.Item("data").Count > 0 Then
+            For Each node In resultObject.Item("data")
+                Dim ipAddress As String = node.Item("ip")
+
+                If ipAddress.Contains(":") Then
+                    ipList.Add(ipAddress)
+                Else
+                    ipAddress &= ":16127"
+                    ipList.Add(ipAddress)
+                End If
+            Next
+        End If
+        GetNodeInfo = ipList
+    End Function
+
+    Sub GetNodeBenchMarks(ip)
+        Dim WebClient As New WebClient
+        Dim result = WebClient.DownloadString(String.Format("http://{0}/daemon/getbenchmarks", ip))
         Console.WriteLine(result)
-        Console.ReadLine()
+        Console.ReadKey()
     End Sub
 
 End Module
