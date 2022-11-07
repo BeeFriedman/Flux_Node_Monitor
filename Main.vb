@@ -1,5 +1,6 @@
 ﻿Imports System.Net
 Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
 
 Module Main
 
@@ -50,7 +51,15 @@ Module Main
     Sub GetNodeBenchMarks(ip)
         Dim WebClient As New WebClient
         Dim result = WebClient.DownloadString(String.Format("http://{0}/daemon/getbenchmarks", ip))
-        Console.WriteLine(result)
+        Dim resultObject = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(result)
+        Dim benchmarksResult = JToken.Parse(resultObject.Item("data"))
+        Dim status = benchmarksResult.Item("status")
+
+        If status = "failed" Then
+            Console.WriteLine("Failed")
+        Else
+            Console.WriteLine("Passed")
+        End If
         Console.ReadKey()
     End Sub
 
