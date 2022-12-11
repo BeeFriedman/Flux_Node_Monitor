@@ -3,11 +3,13 @@ Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
 Module Main
+    Private ipFailList As New List(Of String)
 
     Sub Main()
         Console.WriteLine("Enter Wallet Address:")
         Dim walletAddress = Console.ReadLine()
         VerifyWallet(walletAddress)
+        SendEmail(ipFailList)
     End Sub
 
     Sub VerifyWallet(walletAddress)
@@ -56,11 +58,8 @@ Module Main
         Dim status = benchmarksResult.Item("status")
 
         If status = "failed" Then
-            Console.WriteLine("Failed")
-        Else
-            Console.WriteLine("Passed")
+            ipFailList.Add(ip)
         End If
-        Console.ReadKey()
     End Sub
 
 End Module
